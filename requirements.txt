@@ -2,3 +2,5 @@ streamlit
 google-generativeai
 langchain
 sentence-transformers
+pypdf
+numpy
