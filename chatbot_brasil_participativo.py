@@ -5,6 +5,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
+from sentence_transformers import SentenceTransformer
 
 # Configurar API da Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
