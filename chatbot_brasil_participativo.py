@@ -1,3 +1,4 @@
+# Importar as bibliotecas
 import streamlit as st
 import os
 import google.generativeai as genai
@@ -7,12 +8,11 @@ from sentence_transformers import SentenceTransformer
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 
-# ✅ TEM QUE SER A PRIMEIRA CHAMADA DO STREAMLIT
+# Configurar o título da página
 st.set_page_config(page_title="Chatbot - Brasil Participativo", page_icon="🤖")
 
 # Configurar API da Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 system_prompt = """
@@ -24,51 +24,61 @@ Você é um assistente virtual especializado em participação social. Ao recebe
 5. Seja educado!
 """
 
-@st.cache_resource
-def setup_rag():
+# Verificar se o arquivo existe
+if os.path.exists("FAQ.docx.pdf"):
     try:
-        if not os.path.exists("FAQ.docx.pdf"):
-            st.warning("Arquivo PDF 'FAQ.docx.pdf' não encontrado.")
-            return None
-        
+        # Carregar o PDF
         loader = PyPDFLoader("FAQ.docx.pdf")
         docs = loader.load()
-        
+
+        # Dividir o texto em pedaços
         splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500)
         chunks = splitter.split_documents(docs)
 
+        # Criar os embeddings
         embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        db = FAISS.from_documents(chunks, embeddings)
-        return db
+
+        # Criar a base vetorial
+        vectorstore = FAISS.from_documents(chunks, embeddings)
+
     except Exception as e:
         st.error(f"Erro ao configurar RAG: {e}")
-        return None
+        vectorstore = None
+else:
+    st.warning("Arquivo PDF 'FAQ.docx.pdf' não encontrado.")
+    vectorstore = None
 
-vectorstore = setup_rag()
+# Entrada do usuário
+user_input = st.text_input("Digite sua dúvida sobre participação social:")
 
-def get_relevant_info(query):
-    if not vectorstore:
-        return None
-    try:
-        docs = vectorstore.similarity_search(query, k=2)
-        return "\n\n".join([doc.page_content for doc in docs])
-    except Exception as e:
-        st.error(f"Erro ao buscar informações: {e}")
-        return None
+if st.button("Enviar") and user_input.strip():
+    relevant_info = None
 
-def generate_response(user_input, history):
-    relevant_info = get_relevant_info(user_input)
+    # Buscar documentos relevantes
+    if vectorstore:
+        try:
+            docs = vectorstore.similarity_search(user_input, k=2)
+            relevant_info = "\n\n".join([doc.page_content for doc in docs])
+        except Exception as e:
+            st.error(f"Erro ao buscar informações: {e}")
+
+    # Montar o prompt
     full_prompt = system_prompt
     if relevant_info:
         full_prompt += f"\n\nInformações relevantes:\n{relevant_info}"
-    
+
     try:
-        response = model.generate_content([f"{history}\nUsuário: {user_input}\nAssistente:", full_prompt])
-        return response.text
+        # Gerar a resposta
+        response = model.generate_content([f"{st.session_state.conversation}\nUsuário: {user_input}\nAssistente:", full_prompt])
+        resposta = response.text
     except Exception as e:
-        return f"Erro ao gerar resposta: {e}"
+        resposta = f"Erro ao gerar resposta: {e}"
 
+    # Exibir resposta
+    st.write(f"**Assistente**: {resposta}")
+    st.session_state.conversation += f"\nUsuário: {user_input}\nAssistente: {resposta}"
 
+# Configurar a página
 st.title("🤖 Chatbot - Plataforma Brasil Participativo")
 
 if "history" not in st.session_state:
