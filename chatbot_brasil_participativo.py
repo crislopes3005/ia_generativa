@@ -3,9 +3,12 @@ import os
 import google.generativeai as genai
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from sentence_transformers import SentenceTransformer
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
-from sentence_transformers import SentenceTransformer
+
+# ✅ TEM QUE SER A PRIMEIRA CHAMADA DO STREAMLIT
+st.set_page_config(page_title="Chatbot - Brasil Participativo", page_icon="🤖")
 
 # Configurar API da Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -65,8 +68,7 @@ def generate_response(user_input, history):
     except Exception as e:
         return f"Erro ao gerar resposta: {e}"
 
-# Interface Streamlit
-st.set_page_config(page_title="Chatbot - Brasil Participativo", page_icon="🤖")
+
 st.title("🤖 Chatbot - Plataforma Brasil Participativo")
 
 if "history" not in st.session_state:
