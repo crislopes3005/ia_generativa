@@ -31,9 +31,9 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 
 # RAG: carregar e processar o PDF
 vectorstore = None
-if os.path.exists("FAQ.docx.pdf"):
+if os.path.exists("FAQ.pdf"):
     try:
-        loader = PyPDFLoader("FAQ.docx.pdf")
+        loader = PyPDFLoader("FAQ.pdf")
         docs = loader.load()
 
         splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500)
@@ -44,7 +44,7 @@ if os.path.exists("FAQ.docx.pdf"):
     except Exception as e:
         st.error(f"Erro ao configurar RAG: {e}")
 else:
-    st.warning("Arquivo PDF 'FAQ.docx.pdf' não encontrado.")
+    st.warning("Arquivo PDF 'FAQ.pdf' não encontrado.")
 
 # Interface de entrada
 user_input = st.text_input("Digite sua dúvida sobre participação social e clique em Enviar:")
