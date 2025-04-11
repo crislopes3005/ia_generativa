@@ -55,11 +55,12 @@ def setup_rag():
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500)
         texts = text_splitter.split_documents(documents)
         
-        embeddings = HuggingFaceEmbeddings(
-            model_name="modelo_local",
-            model_kwargs={"local_files_only": True}
-        )
-        db = FAISS.from_documents(texts, embeddings)
+        # RAG - usando modelo local para embeddings
+    embeddings = HuggingFaceEmbeddings(
+        model_name="./modelo_local",  # use o caminho certo aqui
+        model_kwargs={"device": "cpu"}  # ou "cuda" se usar GPU
+    )
+    db = FAISS.from_documents(texts, embeddings)
         
         return db
     except Exception as e:
