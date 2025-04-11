@@ -30,7 +30,7 @@ except ImportError as e:
     st.stop()
 
 # Configurar a chave da API
-genai.configure(api_key="AIzaSyD6dpEEUjrKLNqO8XmrzqMUf5nvn4g8Cn0")  # Substitua pela sua chave
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Criar o modelo
 model = genai.GenerativeModel("gemini-1.5-flash")
@@ -55,7 +55,10 @@ def setup_rag():
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500)
         texts = text_splitter.split_documents(documents)
         
-        embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embeddings = HuggingFaceEmbeddings(
+            model_name="modelo_local",
+            model_kwargs={"local_files_only": True}
+        )
         db = FAISS.from_documents(texts, embeddings)
         
         return db
