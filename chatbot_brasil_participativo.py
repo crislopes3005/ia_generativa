@@ -1,4 +1,4 @@
-# Importar as bibliotecas
+ique em # Importar as bibliotecas
 import streamlit as st
 import os
 import google.generativeai as genai
@@ -49,7 +49,7 @@ else:
     vectorstore = None
 
 # Entrada do usuário
-user_input = st.text_input("Digite sua dúvida sobre participação social:")
+user_input = st.text_input("Digite sua dúvida sobre participação social e clique em "Enviar":")
 
 if st.button("Enviar") and user_input.strip():
     relevant_info = None
