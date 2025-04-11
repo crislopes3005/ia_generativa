@@ -59,7 +59,7 @@ def setup_rag():
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=500)
         texts = text_splitter.split_documents(documents)
 
-        # Usar o modelo local salvo em "./modelo"
+        # Usar o modelo local salvo em "./modelo_local"
         embeddings = HuggingFaceEmbeddings(
             model_name="./modelo",  # caminho da pasta do modelo local
             model_kwargs={"device": "cpu"}
