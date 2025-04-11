@@ -61,7 +61,7 @@ def setup_rag():
 
         # Usar o modelo local salvo em "./modelo_local"
         embeddings = HuggingFaceEmbeddings(
-            model_name="./modelo",  # caminho da pasta do modelo local
+            model_name="./modelo_local",  # caminho da pasta do modelo local
             model_kwargs={"device": "cpu"}
         )
         db = FAISS.from_documents(texts, embeddings)
